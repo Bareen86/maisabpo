@@ -5,7 +5,9 @@ VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinaryDataRepresentation", "lw1\BinaryDataRepresentation.csproj", "{0C354106-8067-4695-B5B8-9AE59E73F655}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitOperations", "BitOperations\BitOperations.csproj", "{7F2417AD-857E-46F8-81C4-C19DFDABD575}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitOperations", "BitOperations\BitOperations.csproj", "{7F2417AD-857E-46F8-81C4-C19DFDABD575}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModuleArithmetic", "ModuleArithmetic\ModuleArithmetic.csproj", "{83E3E1A1-95CB-462B-82B4-0542F877199E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{7F2417AD-857E-46F8-81C4-C19DFDABD575}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F2417AD-857E-46F8-81C4-C19DFDABD575}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F2417AD-857E-46F8-81C4-C19DFDABD575}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83E3E1A1-95CB-462B-82B4-0542F877199E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83E3E1A1-95CB-462B-82B4-0542F877199E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83E3E1A1-95CB-462B-82B4-0542F877199E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83E3E1A1-95CB-462B-82B4-0542F877199E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
