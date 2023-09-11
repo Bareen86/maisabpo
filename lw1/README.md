@@ -8,6 +8,7 @@
 
 # 1. Бинарное представление данных.
 
+```cs
 int n = 10;
 
 List<int> primes = GetPrimes( n );
@@ -45,3 +46,4 @@ bool IsPrime( int number )
     }
     return true;
 }
+```
