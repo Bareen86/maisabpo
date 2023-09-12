@@ -132,7 +132,7 @@ bool ValidateFormatType( string formatType )
     }
 }
 ```
-
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/d1a0d51e-b6aa-42cb-9c96-4cab260c02d1)
 
 # 2. Битовые операции.
 
@@ -269,6 +269,7 @@ void PrintResult(ulong result)
     Console.WriteLine( $"Двоичный: {Convert.ToString( ( long )result, 2 )}" );
 }
 ```
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/f8d06f60-cff2-4f51-ae0a-53d95bf34e4a)
 
 # 3. Модульная арифметика
 
@@ -348,6 +349,7 @@ ulong ModInverse( ulong a, ulong m )
     return x;
 }
 ```
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/9b9e5c26-a4d9-4487-879b-5220d1b66fb0)
 
 # 3.2 Модульная арифметика на полиномах GF(2,n)
 
@@ -444,6 +446,7 @@ int GFDivide( int a, int b, int n, int M )
     return GFMultiply( a, inverseB, n, M );
 }
 ```
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/e9286ab3-f637-4e2f-9c7c-6ed013e6795e)
 
 # 4. Проверка числа на простоту
 
@@ -486,3 +489,5 @@ bool IsPrime( int number )
     return true;
 }
 ```
+
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/6ff4675d-2e24-41ef-be9b-d9de5f03b726)
