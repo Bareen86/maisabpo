@@ -1,74 +1,84 @@
-﻿ulong M = 5;
-ulong m = 6;
+﻿int a = 11;
+int b = 12;
+int M = 551;
 
-Console.WriteLine( $"m = {m}" );
+Console.WriteLine( $"(a + b) mod M = {ModuloAdd( a, b, M )}" );
+Console.WriteLine( $"(a - b) mod M = {ModuloSubtract( a, b, M )}" );
+Console.WriteLine( $"(a * b) mod M = {ModuloMultiply( a, b, M )}" );
+Console.WriteLine( $"(a ^ b) mod M = {ModuloPower( a, b, M )}" );
 
-ulong sum = ( m + 2 ) % M;
-Console.WriteLine( $"m + 2 = {sum}" );
+int aInverse = ModuloInverse( a, M );
+if ( aInverse != -1 )
+    Console.WriteLine( $"a^(-1) mod M = {aInverse}" );
+else
+    Console.WriteLine( "a^(-1) mod M: нет решения" );
 
-ulong diff = ( m - 2 + M ) % M;
-Console.WriteLine( $"m - 2 = {diff}" );
+int bInverse = ModuloInverse( b, M );
+if ( bInverse != -1 )
+    Console.WriteLine( $"b^(-1) mod M = {bInverse}" );
+else
+    Console.WriteLine( "b^(-1) mod M: нет решения" );
 
-ulong product = ( m * 2 ) % M;
-Console.WriteLine( $"m * 2 = {product}" );
+if ( aInverse != -1 )
+    Console.WriteLine( "(b / a) mod M = " + ( ( b * aInverse ) % M ) );
+else
+    Console.WriteLine( "b / a mod M: нет решения" );
 
-ulong power = ModPow( m, 3, M );
-Console.WriteLine( $"m ^ 3 = {power}" );
+if ( bInverse != -1 )
+    Console.WriteLine( "(a / b) mod M = " + ( ( a * bInverse ) % M ) );
+else
+    Console.WriteLine( "a / b mod M: нет решения" );
 
-ulong inverse = ModInverse( m, M );
-Console.WriteLine( $"1 / m = {inverse}" );
-
-ulong quotient = ( m * ModInverse( 987654321, M ) ) % M;
-Console.WriteLine( $"m / 2 = {quotient}" );
-
-ulong ModPow( ulong a, ulong b, ulong m )
+static int ModuloAdd( int a, int b, int M )
 {
-    ulong result = 1;
+    return ( a + b ) % M;
+}
 
+static int ModuloSubtract( int a, int b, int M )
+{
+    return ( a - b + M ) % M;
+}
+
+static int ModuloMultiply( int a, int b, int M )
+{
+    return ( a * b ) % M;
+}
+
+static int ModuloPower( int a, int b, int M )
+{
+    int result = 1;
     while ( b > 0 )
     {
-        if ( ( b & 1 ) == 1 )
-        {
-            result = ( result * a ) % m;
-        }
-
-        a = ( a * a ) % m;
-        b >>= 1;
+        if ( b % 2 == 1 )
+            result = ( result * a ) % M;
+        a = ( a * a ) % M;
+        b /= 2;
     }
-
     return result;
 }
 
-ulong ModInverse( ulong a, ulong m )
+static int ModuloInverse( int a, int M )
 {
-    ulong m0 = m;
-    ulong y = 0, x = 1;
-
-    if ( m == 1 )
-    {
-        return 0;
-    }
-
-    while ( a > 1 )
-    {
-        // q - коэффицент
-        ulong q = a / m;
-
-        ulong t = m;
-
-        // Алгоритм Евклида
-        m = a % m;
-        a = t;
-        t = y;
-
-        y = x - q * y;
-        x = t;
-    }
-
-    if ( x < 0 )
-    {
-        x += m0;
-    }
-
+    int gcd, x, y;
+    gcd = ExtendedEuclideanAlgorithm( a, M, out x, out y );
+    if ( gcd != 1 )
+        return -1;
+    x = ( x % M + M ) % M;
     return x;
+}
+
+static int ExtendedEuclideanAlgorithm( int a, int b, out int x, out int y )
+{
+    if ( b == 0 )
+    {
+        x = 1;
+        y = 0;
+        return a;
+    }
+
+    int x1, y1;
+    int gcd = ExtendedEuclideanAlgorithm( b, a % b, out x1, out y1 );
+    x = y1;
+    y = x1 - ( a / b ) * y1;
+    return gcd;
 }
