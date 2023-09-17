@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleArithmetic", "ModuleA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleArithmeticOnPolynomials", "ModuleArithmeticOnPolynomials\ModuleArithmeticOnPolynomials.csproj", "{B0BE18F1-2270-466D-9133-34989948D133}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckNumberForPrime", "CheckNumberForPrime\CheckNumberForPrime.csproj", "{4CE6F8E3-C862-440F-8DB2-144AD57B994A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckNumberForPrime", "CheckNumberForPrime\CheckNumberForPrime.csproj", "{4CE6F8E3-C862-440F-8DB2-144AD57B994A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BigIntegerLib", "BigIntegerLib\BigIntegerLib.csproj", "{96297C4E-2120-46E4-B619-FC8859E34539}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{4CE6F8E3-C862-440F-8DB2-144AD57B994A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CE6F8E3-C862-440F-8DB2-144AD57B994A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CE6F8E3-C862-440F-8DB2-144AD57B994A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96297C4E-2120-46E4-B619-FC8859E34539}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96297C4E-2120-46E4-B619-FC8859E34539}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96297C4E-2120-46E4-B619-FC8859E34539}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96297C4E-2120-46E4-B619-FC8859E34539}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
