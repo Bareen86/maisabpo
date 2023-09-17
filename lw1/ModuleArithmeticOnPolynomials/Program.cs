@@ -1,91 +1,86 @@
-﻿int n = 8; // степень полинома
-int M = 0x11B; // модуль поля GF(2, n)
+﻿// входные данные
+uint a = 365;   // 101101101
+uint b = 1514;  // 10111101010
+uint M = 69665; // 10001000000100001
 
-Console.WriteLine( "Введите два полинома в формате чисел (hex):" );
-Console.Write( "Первый полином: " );
-int a = int.Parse( Console.ReadLine(), System.Globalization.NumberStyles.HexNumber );
-Console.Write( "Второй полином: " );
-int b = int.Parse( Console.ReadLine(), System.Globalization.NumberStyles.HexNumber );
+Console.WriteLine( $"a = {a} = {Convert.ToString( a, 2 )}" );
+Console.WriteLine( $"b = {b} = {Convert.ToString( b, 2 )}" );
+Console.WriteLine( $"M = {M} = {Convert.ToString( M, 2 )}" );
 
-Console.WriteLine( "Выберите операцию (сложение - '+', вычитание - '-', умножение - '*', возведение в степень - '^', поиск обратного элемента - 'inv', деление - '/'): " );
-string operation = Console.ReadLine();
+// сложение
+uint sum = Add( a, b, M );
+Console.WriteLine( $"a+b mod M = {sum}" );
 
-int result = 0;
+// вычитание
+uint sub = Sub( a, b, M );
+Console.WriteLine( $"a-b mod M = {sub}" );
 
-switch ( operation )
-{
-    case "+":
-        result = GFAdd( a, b, n );
-        break;
-    case "-":
-        result = GFSubtract( a, b );
-        break;
-    case "*":
-        result = GFMultiply( a, b, n, M );
-        break;
-    case "^":
-        Console.Write( "Введите степень: " );
-        int pow = int.Parse( Console.ReadLine() );
-        result = GFPow( a, pow, n, M );
-        break;
-    case "inv":
-        result = GFInverse( a, n, M );
-        break;
-    case "/":
-        result = GFDivide( a, b, n, M );
-        break;
-    default:
-        Console.WriteLine( "Некорректная операция" );
-        break;
-}
+// умножение
+uint mul = Mul( a, b, M );
+Console.WriteLine( $"a*b mod M = {mul}" );
 
-Console.WriteLine( "Результат: " + result.ToString( "X" ) );
+// поиск обратного элемента
+uint inv = Inv( 2, M );
+Console.WriteLine( $"2^(-1) mod M = {inv}" );
 
-int GFAdd( int a, int b, int n )
+// деление
+uint div = Div( a, b, M );
+Console.WriteLine( $"a/b mod M = {div}" );
+
+// функция сложения двух чисел в поле GF(2,n)
+static uint Add( uint a, uint b, uint M )
 {
     return a ^ b;
 }
 
-int GFSubtract( int a, int b )
+// функция вычитания двух чисел в поле GF(2,n)
+static uint Sub( uint a, uint b, uint M )
 {
     return a ^ b;
 }
 
-int GFMultiply( int a, int b, int n, int M )
+// функция умножения двух чисел в поле GF(2,n)
+static uint Mul( uint a, uint b, uint M )
 {
-    int result = 0;
+    uint res = 0;
     while ( b != 0 )
     {
         if ( ( b & 1 ) != 0 )
-            result ^= a;
+        {
+            res ^= a;
+        }
         a <<= 1;
-        if ( ( a & ( 1 << n ) ) != 0 )
+        if ( ( a & ( 1 << 16 ) ) != 0 )
+        {
             a ^= M;
+        }
         b >>= 1;
     }
-    return result;
+    return res;
 }
 
-int GFPow( int a, int pow, int n, int M )
+// функция поиска обратного элемента в поле GF(2,n)
+static uint Inv( uint a, uint M )
 {
-    int result = 1;
-    while ( pow != 0 )
+    uint x = 1, y = 0;
+    for ( int i = 0; i < 16; i++ )
     {
-        if ( ( pow & 1 ) != 0 )
-            result = GFMultiply( result, a, n, M );
-        a = GFMultiply( a, a, n, M );
-        pow >>= 1;
+        if ( ( a & ( 1 << i ) ) != 0 )
+        {
+            y ^= x;
+        }
+        x <<= 1;
+        if ( ( x & ( 1 << 16 ) ) != 0 )
+        {
+            x ^= M;
+        }
     }
-    return result;
+    return y;
 }
 
-int GFInverse( int a, int n, int M )
+// функция деления двух чисел в поле GF(2,n)
+static uint Div( uint a, uint b, uint M )
 {
-    return GFPow( a, ( 1 << n ) - 2, n, M );
-}
-
-int GFDivide( int a, int b, int n, int M )
-{
-    int inverseB = GFInverse( b, n, M );
-    return GFMultiply( a, inverseB, n, M );
+    uint inv = Inv( b, M );
+    return Mul( a, inv, M );
 }
