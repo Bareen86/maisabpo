@@ -67,12 +67,6 @@ else
     Console.WriteLine( "Вы ввели некорректно одну из следующих комманд: xor, and, or, set1, set0, shl, shr, shlc, shrc, mix." );
 }
 
-
-
-
-
-
-
 bool ValidateCommandType( string formatType )
 {
 
