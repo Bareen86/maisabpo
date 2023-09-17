@@ -11,7 +11,7 @@ if ( ValidateCommandType( commandType ) )
 
     ulong num1, num2;
 
-    if (!ulong.TryParse( stringNumber1, out num1 ) || !ulong.TryParse(stringNumber2, out num2 ) )
+    if ( !ulong.TryParse( stringNumber1, out num1 ) || !ulong.TryParse( stringNumber2, out num2 ) )
     {
         Console.WriteLine( "Неверный формат числа." );
         return;
@@ -56,11 +56,11 @@ if ( ValidateCommandType( commandType ) )
             PrintResult( result );
             break;
         case "mix":
-            var results = Mix( num1, num2, (int)num2 );
+            var results = Mix( num1, num2 );
             PrintResult( results );
             break;
     }
-    
+
 }
 else
 {
@@ -103,33 +103,23 @@ bool ValidateCommandType( string formatType )
     }
 }
 
-ulong Mix( ulong num1, ulong num2, int bitOrder )
+ulong Mix( ulong order, ulong num )
 {
-    byte[] bytes = BitConverter.GetBytes( num2 );
+    string orderString = order.ToString();
+    string numBinary = Convert.ToString( ( long )num, 2 ).PadLeft( 8, '0' );
 
-    for ( int i = 0; i < bytes.Length; i++ )
+    char[] mixedNum = new char[ 8 ];
+    for ( int i = 0; i < 8; i++ )
     {
-        byte b = bytes[ i ];
-        byte newByte = 0;
-
-        for ( int j = 0; j < 8; j++ )
-        {
-            int oldBitIndex = ( bitOrder * 8 ) + j;
-            int newBitIndex = ( i * 8 ) + j;
-
-            if ( ( num1 & ( 1UL << oldBitIndex ) ) != 0 )
-            {
-                newByte |= ( byte )( 1 << j );
-            }
-        }
-
-        bytes[ i ] = newByte;
+        int index = int.Parse( orderString[ i ].ToString() );
+        mixedNum[ i ] = numBinary[ index ];
     }
 
-    return BitConverter.ToUInt64( bytes, 0 );
+    ulong mixedNumDecimal = Convert.ToUInt64( new string( mixedNum ), 2 );
+    return mixedNumDecimal;
 }
 
-void PrintResult(ulong result)
+void PrintResult( ulong result )
 {
     Console.WriteLine( "Результат:" );
     Console.WriteLine( $"Десятичный: {result}" );
