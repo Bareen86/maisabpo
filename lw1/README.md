@@ -140,7 +140,7 @@ bool ValidateFormatType( string formatType )
 Console.WriteLine( "Введите одну из следующих команд: xor, and, or, set1, set0, shl, shr, shlc, shrc, mix." );
 string commandType = Console.ReadLine();
 
-if ( ValidateCommandType( commandType ) ) // Проверка типа команды
+if ( ValidateCommandType( commandType ) )
 {
     Console.WriteLine( "\nВведите число 1: " );
     string stringNumber1 = Console.ReadLine();
@@ -150,13 +150,13 @@ if ( ValidateCommandType( commandType ) ) // Проверка типа кома�
 
     ulong num1, num2;
 
-    if (!ulong.TryParse( stringNumber1, out num1 ) || !ulong.TryParse(stringNumber2, out num2 ) )
+    if ( !ulong.TryParse( stringNumber1, out num1 ) || !ulong.TryParse( stringNumber2, out num2 ) )
     {
         Console.WriteLine( "Неверный формат числа." );
         return;
     }
 
-    switch ( commandType ) // Смотрим тип комманды и выполняем соответствующие действия
+    switch ( commandType )
     {
         case "xor":
             ulong result = num1 ^ num2;
@@ -170,35 +170,36 @@ if ( ValidateCommandType( commandType ) ) // Проверка типа кома�
             result = num1 | num2;
             PrintResult( result );
             break;
-        case "set1": // Операции set0 и set1 используются для установки определенного бита в заданном числе в 0 или 1 соответственно
+        case "set1":
             result = num2 | ( 1UL << ( int )num1 );
             PrintResult( result );
             break;
-        case "set0": 
+        case "set0":
             result = num2 & ~( 1UL << ( int )num1 );
             PrintResult( result );
             break;
-        case "shl": // обычный сдвиг влево
+        case "shl":
             result = num2 << ( int )num1;
             PrintResult( result );
             break;
-        case "shr": // обычный сдвиг вправо
+        case "shr":
             result = num2 >> ( int )num1;
             PrintResult( result );
             break;
-        case "shlc": // циклический сдвиг влево
+        case "shlc":
             result = ( num2 << ( int )num1 ) | ( num2 >> ( 64 - ( int )num1 ) );
             PrintResult( result );
             break;
-        case "shrc": // циклический сдвиг вправо
+        case "shrc":
             result = ( num2 >> ( int )num1 ) | ( num2 << ( 64 - ( int )num1 ) );
             PrintResult( result );
             break;
         case "mix":
-            var results = Mix( num1, num2, (int)num2 );
+            var results = Mix( num1, num2 );
             PrintResult( results );
             break;
     }
+
 }
 else
 {
@@ -235,33 +236,23 @@ bool ValidateCommandType( string formatType )
     }
 }
 
-ulong Mix( ulong num1, ulong num2, int bitOrder )
+ulong Mix( ulong order, ulong num )
 {
-    byte[] bytes = BitConverter.GetBytes( num2 );
+    string orderString = order.ToString();
+    string numBinary = Convert.ToString( ( long )num, 2 ).PadLeft( 8, '0' );
 
-    for ( int i = 0; i < bytes.Length; i++ )
+    char[] mixedNum = new char[ 8 ];
+    for ( int i = 0; i < 8; i++ )
     {
-        byte b = bytes[ i ];
-        byte newByte = 0;
-
-        for ( int j = 0; j < 8; j++ )
-        {
-            int oldBitIndex = ( bitOrder * 8 ) + j;
-            int newBitIndex = ( i * 8 ) + j;
-
-            if ( ( num1 & ( 1UL << oldBitIndex ) ) != 0 )
-            {
-                newByte |= ( byte )( 1 << j );
-            }
-        }
-
-        bytes[ i ] = newByte;
+        int index = int.Parse( orderString[ i ].ToString() );
+        mixedNum[ i ] = numBinary[ index ];
     }
 
-    return BitConverter.ToUInt64( bytes, 0 );
+    ulong mixedNumDecimal = Convert.ToUInt64( new string( mixedNum ), 2 );
+    return mixedNumDecimal;
 }
 
-void PrintResult(ulong result)
+void PrintResult( ulong result )
 {
     Console.WriteLine( "Результат:" );
     Console.WriteLine( $"Десятичный: {result}" );
@@ -269,184 +260,189 @@ void PrintResult(ulong result)
     Console.WriteLine( $"Двоичный: {Convert.ToString( ( long )result, 2 )}" );
 }
 ```
-![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/f8d06f60-cff2-4f51-ae0a-53d95bf34e4a)
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/0ab7217e-e2cc-4a81-b2ba-4f7ded94a0ec)
 
 # 3. Модульная арифметика
 
 ```cs
-ulong M = 5;
-ulong m = 6;
+int a = 11;
+int b = 12;
+int M = 551;
 
-Console.WriteLine( $"m = {m}" );
+Console.WriteLine( $"(a + b) mod M = {ModuloAdd( a, b, M )}" );
+Console.WriteLine( $"(a - b) mod M = {ModuloSubtract( a, b, M )}" );
+Console.WriteLine( $"(a * b) mod M = {ModuloMultiply( a, b, M )}" );
+Console.WriteLine( $"(a ^ b) mod M = {ModuloPower( a, b, M )}" );
 
-ulong sum = ( m + 2 ) % M; // Сложение: мы просто складываем число m с другим числом и берем остаток от деления на модуль M.
-Console.WriteLine( $"m + 2 = {sum}" );
+int aInverse = ModuloInverse( a, M );
+if ( aInverse != -1 )
+    Console.WriteLine( $"a^(-1) mod M = {aInverse}" );
+else
+    Console.WriteLine( "a^(-1) mod M: нет решения" );
 
-ulong diff = ( m - 2 + M ) % M; // Вычитание: мы вычитаем другое число из числа m, добавляем модуль M и берем остаток от деления на M.
-Console.WriteLine( $"m - 2 = {diff}" );
+int bInverse = ModuloInverse( b, M );
+if ( bInverse != -1 )
+    Console.WriteLine( $"b^(-1) mod M = {bInverse}" );
+else
+    Console.WriteLine( "b^(-1) mod M: нет решения" );
 
-ulong product = ( m * 2 ) % M; // Умножение: мы умножаем число m на другое число и берем остаток от деления на M.
-Console.WriteLine( $"m * 2 = {product}" );
+if ( aInverse != -1 )
+    Console.WriteLine( "(b / a) mod M = " + ( ( b * aInverse ) % M ) );
+else
+    Console.WriteLine( "b / a mod M: нет решения" );
 
-ulong power = ModPow( m, 3, M ); // Возведение в степень: мы используем алгоритм быстрого возведения в степень для возведения числа m в заданную степень и берем остаток от деления на M.
-Console.WriteLine( $"m ^ 3 = {power}" );
+if ( bInverse != -1 )
+    Console.WriteLine( "(a / b) mod M = " + ( ( a * bInverse ) % M ) );
+else
+    Console.WriteLine( "a / b mod M: нет решения" );
 
-ulong inverse = ModInverse( m, M ); // Поиск обратного элемента: мы используем расширенный алгоритм Евклида для поиска обратного элемента числа m в поле модуля M.
-Console.WriteLine( $"1 / m = {inverse}" );
-
-ulong quotient = ( m * ModInverse( 987654321, M ) ) % M; // Деление: мы находим обратное число для другого числа, затем умножаем число m на это обратное число и берем остаток от деления на M
-Console.WriteLine( $"m / 2 = {quotient}" );
-
-ulong ModPow( ulong a, ulong b, ulong m )
+static int ModuloAdd( int a, int b, int M )
 {
-    ulong result = 1;
+    return ( a + b ) % M;
+}
 
+static int ModuloSubtract( int a, int b, int M )
+{
+    return ( a - b + M ) % M;
+}
+
+static int ModuloMultiply( int a, int b, int M )
+{
+    return ( a * b ) % M;
+}
+
+static int ModuloPower( int a, int b, int M )
+{
+    int result = 1;
     while ( b > 0 )
     {
-        if ( ( b & 1 ) == 1 )
-        {
-            result = ( result * a ) % m;
-        }
-
-        a = ( a * a ) % m;
-        b >>= 1;
+        if ( b % 2 == 1 )
+            result = ( result * a ) % M;
+        a = ( a * a ) % M;
+        b /= 2;
     }
-
     return result;
 }
 
-ulong ModInverse( ulong a, ulong m )
+static int ModuloInverse( int a, int M )
 {
-    ulong m0 = m;
-    ulong y = 0, x = 1;
-
-    if ( m == 1 )
-    {
-        return 0;
-    }
-
-    while ( a > 1 )
-    {
-        // q - коэффицент
-        ulong q = a / m;
-
-        ulong t = m;
-
-        // Алгоритм Евклида
-        m = a % m;
-        a = t;
-        t = y;
-
-        y = x - q * y;
-        x = t;
-    }
-
-    if ( x < 0 )
-    {
-        x += m0;
-    }
-
+    int gcd, x, y;
+    gcd = ExtendedEuclideanAlgorithm( a, M, out x, out y );
+    if ( gcd != 1 )
+        return -1;
+    x = ( x % M + M ) % M;
     return x;
 }
-```
-![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/9b9e5c26-a4d9-4487-879b-5220d1b66fb0)
+
+static int ExtendedEuclideanAlgorithm( int a, int b, out int x, out int y )
+{
+    if ( b == 0 )
+    {
+        x = 1;
+        y = 0;
+        return a;
+    }
+
+    int x1, y1;
+    int gcd = ExtendedEuclideanAlgorithm( b, a % b, out x1, out y1 );
+    x = y1;
+    y = x1 - ( a / b ) * y1;
+    return gcd;
+}
+```    
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/c781a4ea-5b1d-4532-a5f0-20ae21469569)
 
 # 3.2 Модульная арифметика на полиномах GF(2,n)
 
 ```cs
-int n = 8; // степень полинома
-int M = 0x11B; // модуль поля GF(2, n)
+// входные данные
+uint a = 365;   // 101101101
+uint b = 1514;  // 10111101010
+uint M = 69665; // 10001000000100001
 
-Console.WriteLine( "Введите два полинома в формате чисел (hex):" );
-Console.Write( "Первый полином: " );
-int a = int.Parse( Console.ReadLine(), System.Globalization.NumberStyles.HexNumber );
-Console.Write( "Второй полином: " );
-int b = int.Parse( Console.ReadLine(), System.Globalization.NumberStyles.HexNumber );
+Console.WriteLine( $"a = {a} = {Convert.ToString( a, 2 )}" );
+Console.WriteLine( $"b = {b} = {Convert.ToString( b, 2 )}" );
+Console.WriteLine( $"M = {M} = {Convert.ToString( M, 2 )}" );
 
-Console.WriteLine( "Выберите операцию (сложение - '+', вычитание - '-', умножение - '*', возведение в степень - '^', поиск обратного элемента - 'inv', деление - '/'): " );
-string operation = Console.ReadLine();
+// сложение
+uint sum = Add( a, b, M );
+Console.WriteLine( $"a+b mod M = {sum}" );
 
-int result = 0;
+// вычитание
+uint sub = Sub( a, b, M );
+Console.WriteLine( $"a-b mod M = {sub}" );
 
-switch ( operation )
-{
-    case "+":
-        result = GFAdd( a, b, n ); // выполняет сложение полиномов по модулю 2 (используя операцию XOR) и возвращает результат.
-        break;
-    case "-":
-        result = GFSubtract( a, b ); // выполняет вычитание полиномов по модулю 2 (используя операцию XOR) и возвращает результат.
-        break;
-    case "*":
-        result = GFMultiply( a, b, n, M ); //выполняет умножение полиномов по модулю M. Она использует алгоритм "умножения в столбик" с учетом переноса остатка по модулю M. Результат умножения возвращается.
-        break;
-    case "^":
-        Console.Write( "Введите степень: " );
-        int pow = int.Parse( Console.ReadLine() );
-        result = GFPow( a, pow, n, M ); // выполняет возведение полинома в заданную степень. Она использует алгоритм "быстрого возведения в степень" с использованием ранее реализованной функции GFMultiply. Результат возведения в степень возвращается.
-        break;
-    case "inv":
-        result = GFInverse( a, n, M ); // выполняет поиск обратного элемента к заданному полиному. Она использует ранее реализованную функцию GFPow для возведения полинома в степень (2^n - 2). Результат обратного элемента возвращается.
-        break;
-    case "/":
-        result = GFDivide( a, b, n, M ); // выполняет деление полинома a на полином b по модулю M. Она использует ранее реализованную функцию GFInverse для нахождения обратного элемента b. Результат деления возвращается.
-        break;
-    default:
-        Console.WriteLine( "Некорректная операция" );
-        break;
-}
+// умножение
+uint mul = Mul( a, b, M );
+Console.WriteLine( $"a*b mod M = {mul}" );
 
-Console.WriteLine( "Результат: " + result.ToString( "X" ) );
+// поиск обратного элемента
+uint inv = Inv( 2, M );
+Console.WriteLine( $"2^(-1) mod M = {inv}" );
 
-int GFAdd( int a, int b, int n )
+// деление
+uint div = Div( a, b, M );
+Console.WriteLine( $"a/b mod M = {div}" );
+
+// функция сложения двух чисел в поле GF(2,n)
+static uint Add( uint a, uint b, uint M )
 {
     return a ^ b;
 }
 
-int GFSubtract( int a, int b )
+// функция вычитания двух чисел в поле GF(2,n)
+static uint Sub( uint a, uint b, uint M )
 {
     return a ^ b;
 }
 
-int GFMultiply( int a, int b, int n, int M )
+// функция умножения двух чисел в поле GF(2,n)
+static uint Mul( uint a, uint b, uint M )
 {
-    int result = 0;
+    uint res = 0;
     while ( b != 0 )
     {
         if ( ( b & 1 ) != 0 )
-            result ^= a;
+        {
+            res ^= a;
+        }
         a <<= 1;
-        if ( ( a & ( 1 << n ) ) != 0 )
+        if ( ( a & ( 1 << 16 ) ) != 0 )
+        {
             a ^= M;
+        }
         b >>= 1;
     }
-    return result;
+    return res;
 }
 
-int GFPow( int a, int pow, int n, int M )
+// функция поиска обратного элемента в поле GF(2,n)
+static uint Inv( uint a, uint M )
 {
-    int result = 1;
-    while ( pow != 0 )
+    uint x = 1, y = 0;
+    for ( int i = 0; i < 16; i++ )
     {
-        if ( ( pow & 1 ) != 0 )
-            result = GFMultiply( result, a, n, M );
-        a = GFMultiply( a, a, n, M );
-        pow >>= 1;
+        if ( ( a & ( 1 << i ) ) != 0 )
+        {
+            y ^= x;
+        }
+        x <<= 1;
+        if ( ( x & ( 1 << 16 ) ) != 0 )
+        {
+            x ^= M;
+        }
     }
-    return result;
+    return y;
 }
 
-int GFInverse( int a, int n, int M )
+// функция деления двух чисел в поле GF(2,n)
+static uint Div( uint a, uint b, uint M )
 {
-    return GFPow( a, ( 1 << n ) - 2, n, M );
-}
-
-int GFDivide( int a, int b, int n, int M )
-{
-    int inverseB = GFInverse( b, n, M );
-    return GFMultiply( a, inverseB, n, M );
+    uint inv = Inv( b, M );
+    return Mul( a, inv, M );
 }
 ```
-![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/e9286ab3-f637-4e2f-9c7c-6ed013e6795e)
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/e9a54e38-a182-4a09-b89a-f537e58e99d4)
 
 # 4. Проверка числа на простоту
 
@@ -491,3 +487,359 @@ bool IsPrime( int number )
 ```
 
 ![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/6ff4675d-2e24-41ef-be9b-d9de5f03b726)
+
+# 5. Арифметика больших чисел.
+
+```cs
+namespace BigIntegerLib
+{
+    internal class BigInteger
+    {
+        private List<int> digits; // список цифр числа
+        private bool sign; // знак числа (true - положительное, false - отрицательное)
+
+        public BigInteger()
+        {
+            digits = new List<int>();
+            sign = true;
+        }
+
+        public BigInteger( string s )
+        {
+            digits = new List<int>();
+            if ( s[ 0 ] == '-' )
+            {
+                sign = false;
+                s = s.Substring( 1 );
+            }
+            else
+            {
+                sign = true;
+            }
+            for ( int i = s.Length - 1; i >= 0; i-- )
+            {
+                digits.Add( s[ i ] - '0' );
+            }
+        }
+
+        public BigInteger( long n )
+        {
+            digits = new List<int>();
+            if ( n < 0 )
+            {
+                sign = false;
+                n = -n;
+            }
+            else
+            {
+                sign = true;
+            }
+            while ( n > 0 )
+            {
+                digits.Add( ( int )( n % 10 ) );
+                n /= 10;
+            }
+        }
+
+        public BigInteger( BigInteger other )
+        {
+            digits = new List<int>( other.digits );
+            sign = other.sign;
+        }
+
+        private BigInteger( List<int> digits, bool sign )
+        {
+            this.digits = new List<int>( digits );
+            this.sign = sign;
+        }
+
+        public void Print()
+        {
+            if ( !sign )
+            {
+                Console.Write( "-" );
+            }
+            for ( int i = digits.Count - 1; i >= 0; i-- )
+            {
+                Console.Write( digits[ i ] );
+            }
+            Console.WriteLine();
+        }
+
+        public static BigInteger operator +( BigInteger a, BigInteger b )
+        {
+            if ( a.sign != b.sign )
+            {
+                if ( a.sign )
+                {
+                    return a - new BigInteger( b.digits, true );
+                }
+                else
+                {
+                    return b - new BigInteger( a.digits, true );
+                }
+            }
+
+            BigInteger result = new BigInteger();
+            result.sign = a.sign;
+
+            int carry = 0;
+            int i = 0;
+            while ( i < a.digits.Count || i < b.digits.Count || carry != 0 )
+            {
+                int sum = carry;
+                if ( i < a.digits.Count )
+                {
+                    sum += a.digits[ i ];
+                }
+                if ( i < b.digits.Count )
+                {
+                    sum += b.digits[ i ];
+                }
+                result.digits.Add( sum % 10 );
+                carry = sum / 10;
+                i++;
+            }
+
+            return result;
+        }
+
+        public static BigInteger operator -( BigInteger a, BigInteger b )
+        {
+            if ( a.sign != b.sign )
+            {
+                if ( a.sign )
+                {
+                    return a + new BigInteger( b.digits, true );
+                }
+                else
+                {
+                    return new BigInteger( a.digits, true ) + b;
+                }
+            }
+
+            if ( a.Abs() < b.Abs() )
+            {
+                if ( a.sign )
+                {
+                    return new BigInteger( b.digits, true ) - a;
+                }
+                else
+                {
+                    return b - a;
+                }
+            }
+
+            BigInteger result = new BigInteger();
+            result.sign = a.sign;
+
+            int borrow = 0;
+            int i = 0;
+            while ( i < a.digits.Count || i < b.digits.Count || borrow != 0 )
+            {
+                int diff = borrow;
+                if ( i < a.digits.Count )
+                {
+                    diff += a.digits[ i ];
+                }
+                if ( i < b.digits.Count )
+                {
+                    diff -= b.digits[ i ];
+                }
+                if ( diff < 0 )
+                {
+                    diff += 10;
+                    borrow = -1;
+                }
+                else
+                {
+                    borrow = 0;
+                }
+                result.digits.Add( diff );
+                i++;
+            }
+            result.RemoveLeadingZeros();
+
+            return result;
+        }
+
+        public static BigInteger operator *( BigInteger a, BigInteger b )
+        {
+            BigInteger result = new BigInteger();
+            result.sign = ( a.sign == b.sign );
+
+            for ( int i = 0; i < a.digits.Count; i++ )
+            {
+                int carry = 0;
+                BigInteger temp = new BigInteger();
+                for ( int j = 0; j < b.digits.Count; j++ )
+                {
+                    int prod = a.digits[ i ] * b.digits[ j ] + carry;
+                    temp.digits.Add( prod % 10 );
+                    carry = prod / 10;
+                }
+                if ( carry != 0 )
+                {
+                    temp.digits.Add( carry );
+                }
+                for ( int k = 0; k < i; k++ )
+                {
+                    temp.digits.Insert( 0, 0 );
+                }
+                result += temp;
+            }
+
+            result.RemoveLeadingZeros();
+
+            return result;
+        }
+
+        public static BigInteger operator %( BigInteger a, BigInteger b )
+        {
+            BigInteger div = a / b;
+            return a - div * b;
+        }
+
+        public static BigInteger operator /( BigInteger a, BigInteger b )
+        {
+            if ( b == new BigInteger( 0 ) )
+            {
+                throw new DivideByZeroException();
+            }
+
+            BigInteger result = new BigInteger();
+            result.sign = ( a.sign == b.sign );
+
+            a = a.Abs();
+            b = b.Abs();
+
+            while ( a >= b )
+            {
+                int n = a.digits.Count - b.digits.Count;
+                BigInteger temp = b * new BigInteger( ( long )Math.Pow( 10, n ) );
+                while ( temp > a )
+                {
+                    n--;
+                    temp = b * new BigInteger( ( long )Math.Pow( 10, n ) );
+                }
+                result += new BigInteger( n );
+                a -= temp;
+            }
+
+            result.RemoveLeadingZeros();
+
+            return result;
+        }
+
+        public static bool operator ==( BigInteger a, BigInteger b )
+        {
+            if ( a.sign != b.sign || a.digits.Count != b.digits.Count )
+            {
+                return false;
+            }
+            for ( int i = 0; i < a.digits.Count; i++ )
+            {
+                if ( a.digits[ i ] != b.digits[ i ] )
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool operator !=( BigInteger a, BigInteger b )
+        {
+            return !( a == b );
+        }
+
+        public static bool operator <( BigInteger a, BigInteger b )
+        {
+            if ( a.sign != b.sign )
+            {
+                return !a.sign;
+            }
+            if ( a.digits.Count != b.digits.Count )
+            {
+                return ( a.digits.Count < b.digits.Count ) ^ !a.sign;
+            }
+            for ( int i = a.digits.Count - 1; i >= 0; i-- )
+            {
+                if ( a.digits[ i ] != b.digits[ i ] )
+                {
+                    return ( a.digits[ i ] < b.digits[ i ] ) ^ !a.sign;
+                }
+            }
+            return false;
+        }
+
+        public static bool operator >( BigInteger a, BigInteger b )
+        {
+            return !( a < b ) && a != b;
+        }
+
+        public static bool operator <=( BigInteger a, BigInteger b )
+        {
+            return ( a < b ) || ( a == b );
+        }
+
+        public static bool operator >=( BigInteger a, BigInteger b )
+        {
+            return ( a > b ) || ( a == b );
+        }
+
+        public BigInteger Abs()
+        {
+            BigInteger result = new BigInteger( this );
+            result.sign = true;
+            return result;
+        }
+
+        public void RemoveLeadingZeros()
+        {
+            while ( digits.Count > 1 && digits[ digits.Count - 1 ] == 0 )
+            {
+                digits.RemoveAt( digits.Count - 1 );
+            }
+            if ( digits.Count == 1 && digits[ 0 ] == 0 )
+            {
+                sign = true;
+            }
+        }
+
+        public override string ToString()
+        {
+            string result = "";
+            if ( !sign )
+            {
+                result += "-";
+            }
+            for ( int i = digits.Count - 1; i >= 0; i-- )
+            {
+                result += digits[ i ].ToString();
+            }
+            return result;
+        }
+    }
+}
+```
+
+```cs
+using BigIntegerLib;
+
+BigInteger a = new BigInteger( "12345678901234567890" );
+BigInteger b = new BigInteger( "98765432109876543210" );
+
+Console.WriteLine( "a = " + a );
+Console.WriteLine( "b = " + b );
+
+Console.WriteLine( "a + b = " + ( a + b ) );
+Console.WriteLine( "a - b = " + ( a - b ) );
+Console.WriteLine( "a * b = " + ( a * b ) );
+Console.WriteLine( "a / b = " + ( a / b ) );
+Console.WriteLine( "a % b = " + ( a % b ) );
+Console.WriteLine( ( "a == b = " + ( a == b ) ) );
+Console.WriteLine( ( "a > b = " + ( a > b ) ) );
+Console.WriteLine( ( "a < b = " + ( a < b ) ) );
+```
+
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/f98f5335-81ed-4240-b359-8b7fd69dcd32)
