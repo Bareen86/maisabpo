@@ -842,4 +842,5 @@ Console.WriteLine( ( "a > b = " + ( a > b ) ) );
 Console.WriteLine( ( "a < b = " + ( a < b ) ) );
 ```
 
-![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/f98f5335-81ed-4240-b359-8b7fd69dcd32)
+![изображение](https://github.com/Bareen86/maisabpo/assets/79940875/edaa0844-43ec-40e0-b5b2-82649f9a1a9a)
+
